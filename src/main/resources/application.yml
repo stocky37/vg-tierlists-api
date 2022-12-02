@@ -5,3 +5,6 @@ quarkus:
 
   swagger-ui:
     always-include: true
+
+  jackson:
+    property-naming-strategy: SNAKE_CASE

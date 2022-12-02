@@ -22,14 +22,17 @@ abstract class MongoResourceService<Resource : Any, Entity : PanacheMongoEntityB
 	}
 
 	override fun delete(id: String): Uni<Void> {
-		return findById(id).onItem().ifNotNull().transformToUni { e -> delete(e!!) }
+		return findById(id).onItem()
+			.ifNotNull()
+			.transformToUni { e -> delete(e!!) }
+			.replaceWithVoid()
 	}
 
-	open protected fun findById(id: String): Uni<Entity?> {
+	open fun findById(id: String): Uni<Entity?> {
 		return findById(ObjectId(id))
 	}
 
-	protected fun fromNullableEntity(entity: Entity?): Resource? {
+	fun fromNullableEntity(entity: Entity?): Resource? {
 		return if (entity == null) {
 			null
 		} else {

@@ -1,4 +1,4 @@
-package dev.stocky37.tierlists.api
+package dev.stocky37.tierlists.rest.api
 
 import dev.stocky37.tierlists.model.Game
 import dev.stocky37.tierlists.rest.util.NullToNotFound

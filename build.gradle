@@ -10,7 +10,6 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.quarkus:quarkus-smallrye-openapi'
 	implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
 	implementation 'com.github.slugify:slugify:3.0.2'
 	implementation 'io.quarkus:quarkus-arc'
@@ -20,6 +19,7 @@ dependencies {
 	implementation 'io.quarkus:quarkus-mongodb-panache-kotlin'
 	implementation 'io.quarkus:quarkus-resteasy-reactive'
 	implementation 'io.quarkus:quarkus-resteasy-reactive-jackson'
+	implementation 'io.quarkus:quarkus-smallrye-openapi'
 	implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
 
 	testImplementation 'io.quarkus:quarkus-junit5'

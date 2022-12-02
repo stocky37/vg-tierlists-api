@@ -1,9 +1,9 @@
 package dev.stocky37.tierlists.rest
 
-import dev.stocky37.tierlists.api.GameApi
-import dev.stocky37.tierlists.api.GamesApi
 import dev.stocky37.tierlists.core.GameService
 import dev.stocky37.tierlists.model.Game
+import dev.stocky37.tierlists.rest.api.GameApi
+import dev.stocky37.tierlists.rest.api.GamesApi
 import io.smallrye.mutiny.Uni
 import javax.inject.Inject
 
