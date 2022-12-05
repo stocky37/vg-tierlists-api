@@ -2,7 +2,6 @@ package dev.stocky37.tierlists.core
 
 import com.github.slugify.Slugify
 import dev.stocky37.tierlists.db.CharacterEntity
-import dev.stocky37.tierlists.db.GameEntity
 import dev.stocky37.tierlists.model.GameCharacter
 import io.quarkus.mongodb.panache.kotlin.reactive.ReactivePanacheMongoRepository
 import io.smallrye.mutiny.Uni
@@ -12,28 +11,27 @@ import javax.inject.Inject
 
 @ApplicationScoped
 class CharacterService @Inject constructor(
-	private val slugifier: Slugify,
-	private val games: GameService
+	private val slugifier: Slugify
 ) : ReactivePanacheMongoRepository<CharacterEntity> {
 
-//	fun findById(id: String, gameId: String): CharacterEntity? {
-//
-//	}
+	fun create(character: GameCharacter, gameId: String): Uni<GameCharacter> {
+		return create(character, ObjectId(gameId))
+	}
+
+	private fun create(character: GameCharacter, gameId: ObjectId): Uni<GameCharacter> {
+		return persist(toEntity(character, gameId)).map(::fromEntity)
+	}
+
+	fun list(gameId: String): Uni<List<GameCharacter>> {
+		return list(ObjectId(gameId))
+	}
+
+	private fun list(gameId: ObjectId): Uni<List<GameCharacter>> {
+		return find("gameId = ?1", gameId).list().map { list -> list.map(::fromEntity) }
+	}
 
 	fun findById(id: String, gameId: ObjectId): Uni<CharacterEntity?> {
 		return find("id = ?1 and gameId = ?2").firstResult()
-	}
-
-	fun create(character: GameCharacter, gameId: String): Uni<GameCharacter?> {
-		return games.findById(gameId)
-			.onItem().ifNotNull().transformToUni { game -> persist(toEntity(character, game?.id!!)) }
-			.onItem().ifNotNull().transform(::fromEntity)
-	}
-
-	fun list(gameId: String): Uni<List<GameCharacter>?> {
-		return games.findById(gameId)
-			.onItem().ifNotNull().transformToUni { game: GameEntity? -> find("gameId = ?1", game?.id).list() }
-			.onItem().ifNotNull().transform { list -> list.map(::fromEntity) }
 	}
 
 	fun toEntity(character: GameCharacter, gameId: ObjectId): CharacterEntity {
@@ -57,7 +55,5 @@ class CharacterService @Inject constructor(
 		)
 	}
 
-//	fun findBySlug(id: String, gameId: String) {
-//
-//	}
+
 }
