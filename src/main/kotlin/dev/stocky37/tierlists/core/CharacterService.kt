@@ -15,23 +15,38 @@ class CharacterService @Inject constructor(
 ) : ReactivePanacheMongoRepository<CharacterEntity> {
 
 	fun create(character: GameCharacter, gameId: String): Uni<GameCharacter> {
-		return create(character, ObjectId(gameId))
-	}
-
-	private fun create(character: GameCharacter, gameId: ObjectId): Uni<GameCharacter> {
-		return persist(toEntity(character, gameId)).map(::fromEntity)
+		return persist(toEntity(character, ObjectId(gameId))).map(::fromEntity)
 	}
 
 	fun list(gameId: String): Uni<List<GameCharacter>> {
-		return list(ObjectId(gameId))
+		return find("gameId = ?1", ObjectId(gameId)).list().map { list -> list.map(::fromEntity) }
 	}
 
-	private fun list(gameId: ObjectId): Uni<List<GameCharacter>> {
-		return find("gameId = ?1", gameId).list().map { list -> list.map(::fromEntity) }
+	fun get(id: String, gameId: String): Uni<GameCharacter?> {
+		return findById(id, gameId).map(::fromNullableEntity)
 	}
 
-	fun findById(id: String, gameId: ObjectId): Uni<CharacterEntity?> {
-		return find("id = ?1 and gameId = ?2").firstResult()
+	fun findById(id: String, gameId: String): Uni<CharacterEntity?> {
+		return if (ObjectId.isValid(id)) {
+			findById(ObjectId(id), ObjectId(gameId))
+		} else {
+			findBySlug(id, ObjectId(gameId))
+		}
+	}
+
+	fun delete(id: String, gameId: String): Uni<Void> {
+		return findById(id, gameId).onItem()
+			.ifNotNull()
+			.transformToUni { e -> delete(e!!) }
+			.replaceWithVoid()
+	}
+
+	fun findById(id: ObjectId, gameId: ObjectId): Uni<CharacterEntity?> {
+		return find("id = ?1 and gameId = ?2", id, gameId).firstResult()
+	}
+
+	fun findBySlug(slug: String, gameId: ObjectId): Uni<CharacterEntity?> {
+		return find("slug = ?1 and gameId = ?2", slug, gameId).firstResult()
 	}
 
 	fun toEntity(character: GameCharacter, gameId: ObjectId): CharacterEntity {
@@ -53,6 +68,14 @@ class CharacterService @Inject constructor(
 			imageSm = entity.imageSm,
 			imageLg = entity.imageLg
 		)
+	}
+
+	fun fromNullableEntity(entity: CharacterEntity?): GameCharacter? {
+		return if (entity == null) {
+			null
+		} else {
+			fromEntity(entity)
+		}
 	}
 
 
